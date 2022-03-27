@@ -1,4 +1,3 @@
-/-- create --/
 MODULE philosophe(gfourchette, dfourchette)
 /-- le philosophe etat soit etre penser ou manger --/
 VAR
