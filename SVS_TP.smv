@@ -1,51 +1,56 @@
-MODULE philosopher(lfork, rfork)
+/-- create --/
+MODULE philosophe(gfourchette, dfourchette)
+/-- le philosophe etat soit etre penser ou manger --/
 VAR
-	state: {thinking, eating};
+	etat: {penser, manger};
 ASSIGN
-	init(state) := thinking;
-	next(lfork) :=
+/-- l'etat initial penser --/
+	init(etat) := penser;
+/--quand le philosophe prend une fourchette ça devient occupé --/
+	next(gfourchette) :=
 		case
-			(lfork = ready): busy;
-			(lfork = busy): ready;
-			TRUE: lfork;
+			(gfourchette = pret): occupe;
+			(gfourchette = occupe): pret;
+			TRUE: gfourchette;
 		esac;
-	next(rfork) :=
+	next(dfourchette) :=
 		case
-			(rfork = ready): busy;
-			(rfork = busy): ready;
-			TRUE: rfork;
+			(dfourchette = pret): occupe;
+			(dfourchette = occupe): pret;
+			TRUE: dfourchette;
 		esac;
-	next(state):=
+/--ce n'est que lorsque le philosophe prend deux fourchettes qu'il commence à manger--/
+	next(etat):=
 		case
-			(state = thinking & lfork = ready & rfork = ready): eating;
-			(state = eating): thinking;
-			TRUE: state;
+			(etat = penser & gfourchette = pret & dfourchette = pret): manger;
+			(etat = manger): penser;
+			TRUE: etat;
 		esac;
 
 
 MODULE main
 VAR
-	fork0 : {ready, busy};
-	fork1 : {ready, busy};
-	fork2 : {ready, busy};
-	fork3 : {ready, busy};
-	fork4 : {ready, busy};
-	phil0 : process philosopher (fork0, fork1);
-	phil1 : process philosopher (fork1, fork2);
-	phil2 : process philosopher (fork2, fork3);
-	phil3 : process philosopher (fork3, fork4);
-	phil4 : process philosopher (fork4, fork0);
+	fourchette0 : {pret, occupe};
+	fourchette1 : {pret, occupe};
+	fourchette2 : {pret, occupe};
+	fourchette3 : {pret, occupe};
+	fourchette4 : {pret, occupe};
+	philosophe0 : process philosophe (fourchette0, fourchette1);
+	philosophe1 : process philosophe (fourchette1, fourchette2);
+	philosophe2 : process philosophe (fourchette2, fourchette3);
+	philosophe3 : process philosophe (fourchette3, fourchette4);
+	philosophe4 : process philosophe (fourchette4, fourchette0);
 ASSIGN
-	init (fork0) := ready;
-	init (fork1) := ready;
-	init (fork2) := ready;
-	init (fork3) := ready;
-	init (fork4) := ready;
+	init (fourchette0) := pret;
+	init (fourchette1) := pret;
+	init (fourchette2) := pret;
+	init (fourchette3) := pret;
+	init (fourchette4) := pret;
 
 DEFINE
-	starvation := phil0.state = thinking; 
+	starvation := philosophe0.etat = penser; 
 	
-SPEC AG (phil0.state = thinking -> AF (phil0.state = eating));
-SPEC EG (phil0.state = thinking -> AF (phil0.state = eating));
-SPEC EX (phil0.state = thinking -> AF (phil0.state = eating));
+SPEC AG (philosophe0.etat = penser -> AF (philosophe0.etat = manger));
+SPEC EG (philosophe0.etat = penser -> AF (philosophe0.etat = manger));
+SPEC EX (philosophe0.etat = penser -> AF (philosophe0.etat = manger));
 SPEC AG (starvation)
